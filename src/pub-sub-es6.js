@@ -61,20 +61,20 @@ class PubSubEs6Class {
   on = actionType => {
     const _generateUidReact = this._generateUidReact
     return function on(target, name, descriptor) {
-      var oldComponentDidMountFnc    = target.componentDidMount
-      var oldComponentWillUnmountFnc = target.componentWillUnmount
+      var oldComponentOnCreateFnc    = target.oncreate
+      var oldComponentonBeforeRemoveFnc = target.onbeforeremove
 
-      target.componentDidMount = function () {
+      target.oncreate = function () {
         const uid = _generateUidReact({ target })
         if (!this.__uids__) this.__uids__ = []
         this.__uids__.push(uid)
         receive(actionType, this[name].bind(this), uid)
-        if (oldComponentDidMountFnc) oldComponentDidMountFnc.bind(this)()
+        if (oldComponentOnCreateFnc) oldComponentOnCreateFnc.bind(this)()
       }
 
-      target.componentWillUnmount = function () {
+      target.onbeforeremove = function () {
         this.__uids__ && this.__uids__.map(uid => unsubscribe(actionType, uid))
-        if(oldComponentWillUnmountFnc) oldComponentWillUnmountFnc.bind(this)()
+        if(oldComponentonBeforeRemoveFnc) oldComponentonBeforeRemoveFnc.bind(this)()
       }
 
       return descriptor.value
